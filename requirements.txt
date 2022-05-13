@@ -1,0 +1,4 @@
+python-telegram-bot==13.6
+configparser
+oauth2
+cryptography
