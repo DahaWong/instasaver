@@ -102,7 +102,7 @@ async def save_link(update, context):
             markup = InlineKeyboardMarkup(keyboard)
             await context.bot.send_message(
                 chat_id=update.message.chat_id,
-                text=f"[{title}]({link})",
+                text=f"[{title}]({link})" if title else link,
                 reply_markup=markup,
                 parse_mode='MARKDOWN'
             )
