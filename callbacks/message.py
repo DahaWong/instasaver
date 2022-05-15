@@ -98,11 +98,11 @@ async def save_link(update, context):
                     "🗑", callback_data=f'delete_{bookmark_id}'),
                 InlineKeyboardButton(
                     "💙", callback_data=f'like_{bookmark_id}')
-            ],[InlineKeyboardButton("查看文章列表", switch_inline_query_current_chat='')]]
+            ], [InlineKeyboardButton("查看文章列表", switch_inline_query_current_chat='')]]
             markup = InlineKeyboardMarkup(keyboard)
             await context.bot.send_message(
                 chat_id=update.message.chat_id,
-                text=f"<a href='{link}'>{title}</a>" if title else link,
+                text=f"<a href='https://www.instapaper.com/read/{bookmark_id}'>{title}</a>" if title else link,
                 reply_markup=markup,
                 parse_mode=ParseMode.HTML
             )

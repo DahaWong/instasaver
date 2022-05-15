@@ -57,7 +57,7 @@ def verify_user(client):
 
 
 def list_all(client):
-    params = {"limit": 50}
+    params = {"limit": 100}
     bookmarks = client.request(
         root + apis['list'],
         method="POST",

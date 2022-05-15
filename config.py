@@ -14,3 +14,8 @@ proxy = config['BOT']['PROXY']
 # Oauth
 oauth_consumer_id = config['OAUTH']['CONSUMER_ID']
 oauth_consumer_secret = config['OAUTH']['CONSUMER_SECRET']
+
+# Meta
+meta = {
+    'version': '2.1.4'
+}

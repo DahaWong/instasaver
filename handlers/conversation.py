@@ -34,5 +34,5 @@ delete_link_handler = ConversationHandler(
                          cancel_delete_link_handler]
     },
     fallbacks=[cancel_delete_link_handler],
-    allow_reentry=True
+    allow_reentry=False
 )

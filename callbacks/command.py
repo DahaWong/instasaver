@@ -1,5 +1,5 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from utils.api_method import list_all
+from config import meta
 
 
 async def start(update, context):
@@ -50,8 +50,8 @@ async def about(update, context):
     keyboard = [[InlineKeyboardButton("源 代 码", url='https://github.com/dahawong/instasaver'),
                 InlineKeyboardButton("工 作 室", url='https://office.daha.me/')]]
     markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_markdown('*Instasaver*  `2.1.0`\n保存消息中的链接到你的 Instapaper。', reply_markup=markup)
-
-
-async def list_command(update, context):
-    await update.message.reply_text('点击获取未读列表', reply_markup=InlineKeyboardMarkup.from_button(InlineKeyboardButton('📃', switch_inline_query_current_chat='')))
+    await update.message.reply_markdown(
+        (f"*Instasaver*  `{meta['version']}`\n"
+         "保存消息中的链接到你的 Instapaper。\n\n"
+         "由 @dahawong 制作"
+         ), reply_markup=markup)
