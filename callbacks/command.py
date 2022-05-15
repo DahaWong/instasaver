@@ -5,6 +5,7 @@ from utils.api_method import list_all
 async def start(update, context):
     USERNAME = 0
     END = -1
+    context.user_data['message_to_delete'] = []  # initialize message_to_delete
     if not context.user_data.__contains__('logged_in'):
         keyboard_lan = [
             [InlineKeyboardButton("注 册", url='https://www.instapaper.com/'),
@@ -18,7 +19,9 @@ async def start(update, context):
         return USERNAME
     else:
         await update.message.reply_text(
-            '您已登录，可以直接使用！'
+            text='您已登录，可以直接使用！',
+            reply_markup=InlineKeyboardMarkup.from_button(
+                InlineKeyboardButton('查看文章列表', switch_inline_query_current_chat=''))
         )
         return END
 

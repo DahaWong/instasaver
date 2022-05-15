@@ -1,6 +1,7 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, InlineQueryResultArticle, InputTextMessageContent
 from utils.api_method import list_all
 from telegram.constants import ParseMode
+from math import floor
 
 
 async def get_all_unread(update, context):
@@ -9,7 +10,7 @@ async def get_all_unread(update, context):
     def format_unread(bookmark):
         bookmark_id = bookmark['bookmark_id']
         bookmark_url = f"https://www.instapaper.com/read/{bookmark['bookmark_id']}"
-        progress_count = round(bookmark['progress'] * 5)
+        progress_count = floor(bookmark['progress'] * 5)
         keyboard = [[
             InlineKeyboardButton("🗑", callback_data=f'delete_{bookmark_id}'),
             InlineKeyboardButton("💙", callback_data=f'like_{bookmark_id}')
@@ -27,10 +28,10 @@ async def get_all_unread(update, context):
                  '□'*(5-progress_count),
                  f" {round(bookmark['progress']*100)}%",
                  ]),
-            reply_markup=InlineKeyboardMarkup(keyboard)
+            # reply_markup=InlineKeyboardMarkup(keyboard)
         )
     await update.inline_query.answer(
         list(map(format_unread, list_all(client))),
         auto_pagination=True,
-        cache_time=0
+        cache_time=120
     )

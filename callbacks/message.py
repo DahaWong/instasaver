@@ -1,6 +1,6 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.constants import ParseMode
 from utils.persistence import bot_persistence
-import re
 from utils.api_method import get_client, save
 
 VERIFY = 2
@@ -98,13 +98,13 @@ async def save_link(update, context):
                     "🗑", callback_data=f'delete_{bookmark_id}'),
                 InlineKeyboardButton(
                     "💙", callback_data=f'like_{bookmark_id}')
-            ]]
+            ],[InlineKeyboardButton("查看文章列表", switch_inline_query_current_chat='')]]
             markup = InlineKeyboardMarkup(keyboard)
             await context.bot.send_message(
                 chat_id=update.message.chat_id,
-                text=f"[{title}]({link})" if title else link,
+                text=f"<a href='{link}'>{title}</a>" if title else link,
                 reply_markup=markup,
-                parse_mode='MARKDOWN'
+                parse_mode=ParseMode.HTML
             )
     else:
         await update.message.reply_text('请先登录 Instapaper。\n点击开始：/start')
