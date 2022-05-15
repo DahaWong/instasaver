@@ -7,9 +7,9 @@ async def get_all_unread(update, context):
     client = context.user_data.get('client')
 
     def format_unread(bookmark):
-        print(bookmark)
         bookmark_id = bookmark['bookmark_id']
         bookmark_url = f"https://www.instapaper.com/read/{bookmark['bookmark_id']}"
+        progress_count = round(bookmark['progress'] * 5)
         keyboard = [[
             InlineKeyboardButton("🗑", callback_data=f'delete_{bookmark_id}'),
             InlineKeyboardButton("💙", callback_data=f'like_{bookmark_id}')
@@ -21,8 +21,12 @@ async def get_all_unread(update, context):
                 message_text=f"<a href='{bookmark_url}'>{bookmark['title'] or bookmark['url']}</a>",
                 parse_mode=ParseMode.HTML
             ),
-            hide_url=True,
-            description=bookmark['description'] or bookmark['url'],
+            url=bookmark['url'],
+            description=''.join(
+                ['■'*progress_count,
+                 '□'*(5-progress_count),
+                 f" {round(bookmark['progress']*100)}%",
+                 ]),
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
     await update.inline_query.answer(

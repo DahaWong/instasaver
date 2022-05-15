@@ -45,10 +45,12 @@ async def like_link(update, context):
             InlineKeyboardButton("❤️", callback_data=f'unlike_{bookmark_id}')
         ]]
         message = update.callback_query.message
+        inline_message_id = update.callback_query.inline_message_id # this is for inline mode that callback query don't have a message
         markup = InlineKeyboardMarkup(keyboard)
         await bot.edit_message_reply_markup(
-            chat_id=message.chat_id,
-            message_id=message.message_id,
+            chat_id=message.chat_id if message else None,
+            message_id=message.message_id if message else None,
+            inline_message_id= inline_message_id,
             reply_markup=markup
         )
     else:
