@@ -1,5 +1,6 @@
 from telegraph.aio import Telegraph
 from telegraph.utils import ALLOWED_TAGS
+from telegraph.exceptions import CONTENT_TOO_BIG
 from bs4 import BeautifulSoup
 
 
@@ -30,6 +31,6 @@ async def create_page(title, content):
             author_name='Instasaver',
             author_url='https://t.me/saveinstapaper_bot'
         )
+        return response['url']
     except:
         return None
-    return response['url']

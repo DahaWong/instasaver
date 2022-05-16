@@ -32,7 +32,7 @@ async def verify_login(update, context):
     if get_client(context.user_data):
         context.user_data['client'] = get_client(context.user_data)
         context.user_data['logged_in'] = True
-        context.user_data.pop('password')
+        context.user_data.pop('password') # Remove password upon logged in.
         await bot_persistence.flush()
         await bot.edit_message_text(
             chat_id=message.chat_id,
@@ -116,7 +116,7 @@ async def save_link(update, context):
                 )
             else:
                 message_text = (
-                    f"{link}\n"
+                    f"<strong>{preview_url or link}</strong>\n"
                     f"<a href='{link}'>原文</a> | <a href='https://www.instapaper.com/read/{bookmark_id}'>Instapaper</a>"
                 )
             markup = InlineKeyboardMarkup(keyboard)

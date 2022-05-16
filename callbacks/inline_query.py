@@ -15,16 +15,17 @@ async def get_all_unread(update, context):
         preview_url = context.user_data.get(str(bookmark_id)).get(
             'preview_url') if context.user_data.get(str(bookmark_id)) else None
         progress_count = floor(bookmark['progress'] * 5)
-        keyboard = [[
-            InlineKeyboardButton("🗑", callback_data=f'delete_{bookmark_id}'),
-            InlineKeyboardButton("💙", callback_data=f'like_{bookmark_id}')
-        ]]
+        # keyboard = [[
+        #     InlineKeyboardButton("🗑", callback_data=f'delete_{bookmark_id}'),
+        #     InlineKeyboardButton("💙", callback_data=f'like_{bookmark_id}')
+        # ]]
+        keyboard = [[InlineKeyboardButton("查看文章列表", switch_inline_query_current_chat='')]]
         return InlineQueryResultArticle(
             id=bookmark_id,
             title=title or link,
             input_message_content=InputTextMessageContent(
                 message_text=(
-                    f"<a href='{preview_url or link}'>{title or link}</a>\n"
+                    f"<a href='{preview_url or link}'><strong>{title or preview_url or link}</strong></a>\n"
                     f"<a href='{link}'>原文</a> | <a href='https://www.instapaper.com/{bookmark_id}'>Instapaper</a>"
                 ),
                 parse_mode=ParseMode.HTML
@@ -35,7 +36,7 @@ async def get_all_unread(update, context):
                  '□'*(5-progress_count),
                  f" {round(bookmark['progress']*100)}%",
                  ]),
-            # reply_markup=InlineKeyboardMarkup(keyboard)
+            reply_markup=InlineKeyboardMarkup(keyboard)
         )
     await update.inline_query.answer(
         [format_unread(x, context) for x in list_all(client)],
