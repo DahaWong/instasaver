@@ -1,3 +1,9 @@
+'''
+API request methods for manipulating Instapaper account.
+
+1.All request should be made by POST method.
+'''
+
 from config import oauth_consumer_id, oauth_consumer_secret
 import urllib
 import oauth2 as oauth
@@ -14,7 +20,8 @@ apis = {
     'unlike': 'api/1/bookmarks/unstar',
     'archive': 'api/1/bookmarks/archive',
     'unarchive': 'api/1/bookmarks/unarchive',
-    'list': 'api/1/bookmarks/list'
+    'list': 'api/1/bookmarks/list',
+    'get_text': 'api/1/bookmarks/get_text',
 }
 
 
@@ -65,6 +72,17 @@ def list_all(client):
     )[1].decode('utf-8')
     bookmarks = json.loads(bookmarks)
     return filter(lambda x: x['type'] == "bookmark", bookmarks)
+
+
+def get_text(client, bookmark_id):
+    params = {"bookmark_id": bookmark_id}
+    html_text = client.request(
+        root + apis['get_text'],
+        method="POST",
+        body=urllib.parse.urlencode(params)
+    )[1].decode('utf-8')
+
+    return html_text
 
 
 def save(client, url):

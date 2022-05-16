@@ -1,7 +1,7 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
 from utils.persistence import bot_persistence
-from utils.api_method import get_client, save
+from utils.api_method import get_client, get_text, save
 
 VERIFY = 2
 
@@ -59,9 +59,14 @@ async def save_link(update, context):
     logged_in = context.user_data.__contains__('client')
     if logged_in:
         client = context.user_data['client']
-        links = list(update.message.parse_entities('url').values())
-        text_link_entities = filter(
-            lambda x: x.type == 'text_link', update.message.entities)
+        if not update.message.caption:
+            links = list(update.message.parse_entities('url').values())
+            text_link_entities = filter(
+                lambda x: x.type == 'text_link', update.message.entities)
+        else:
+            links = list(update.message.parse_caption_entities('url').values())
+            text_link_entities = filter(
+                lambda x: x.type == 'text_link', update.message.caption_entities)
         text_links = list(map(lambda x: x if x.type ==
                           'url' else x.url, text_link_entities))
         links.extend(text_links)
@@ -74,6 +79,8 @@ async def save_link(update, context):
         # Start saving
         for link in links:
             bookmark_id, title = save(client, link)
+            # html_text = get_text(client, bookmark_id)
+            # print(html_text)
             link_ids[link] = bookmark_id
             titles[bookmark_id] = title
             if bookmark_id:
