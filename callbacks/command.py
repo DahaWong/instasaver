@@ -47,8 +47,8 @@ async def quit_(update, context):
 
 
 async def about(update, context):
-    keyboard = [[InlineKeyboardButton("源 代 码", url='https://github.com/dahawong/instasaver'),
-                InlineKeyboardButton("工 作 室", url='https://office.daha.me/')]]
+    keyboard = [[InlineKeyboardButton("源 代 码", url='https://github.com/DahaWong/instasaver'),
+                InlineKeyboardButton("工 作 室", url='https://dreamlong.design/')]]
     markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_markdown(
         (f"*Instasaver*  `{meta['version']}`\n"
