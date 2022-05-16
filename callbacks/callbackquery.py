@@ -40,7 +40,7 @@ async def request_delete_link(update, context):
 async def confirm_delete_link(update, context):
     query = update.callback_query
     pattern = '(delete_)([0-9]+)'
-    bookmark_id = re.match(pattern, query.data).group(2)
+    bookmark_id:str = re.match(pattern, query.data).group(2)
     client = context.user_data['client']
     delete(client, bookmark_id)
     await query.edit_message_text('删除成功～')
@@ -49,6 +49,7 @@ async def confirm_delete_link(update, context):
             chat_id=update.effective_chat.id,
             message_id=message_id
         )
+    context.user_data.pop(bookmark_id)
     context.user_data['message_to_delete'].clear()
     await bot_persistence.flush()
     return ConversationHandler.END

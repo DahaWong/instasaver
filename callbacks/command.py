@@ -5,7 +5,8 @@ from config import meta
 async def start(update, context):
     USERNAME = 0
     END = -1
-    context.user_data['message_to_delete'] = []  # initialize message_to_delete
+    # Initialize user_data
+    context.user_data['message_to_delete'] = []
     if not context.user_data.__contains__('logged_in'):
         keyboard_lan = [
             [InlineKeyboardButton("注 册", url='https://www.instapaper.com/'),

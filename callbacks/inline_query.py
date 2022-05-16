@@ -7,19 +7,26 @@ from math import floor
 async def get_all_unread(update, context):
     client = context.user_data.get('client')
 
-    def format_unread(bookmark):
+    def format_unread(bookmark, context):
         bookmark_id = bookmark['bookmark_id']
-        bookmark_url = f"https://www.instapaper.com/read/{bookmark['bookmark_id']}"
+        title = bookmark['title']
+        link = bookmark['url']
+        # Check if user_data has the preview url, which means the bookmark had been saved to our bot before
+        preview_url = context.user_data.get(str(bookmark_id)).get(
+            'preview_url') if context.user_data.get(str(bookmark_id)) else None
         progress_count = floor(bookmark['progress'] * 5)
         keyboard = [[
             InlineKeyboardButton("🗑", callback_data=f'delete_{bookmark_id}'),
             InlineKeyboardButton("💙", callback_data=f'like_{bookmark_id}')
         ]]
         return InlineQueryResultArticle(
-            id=bookmark['bookmark_id'],
-            title=bookmark['title'] or bookmark['url'],
+            id=bookmark_id,
+            title=title or link,
             input_message_content=InputTextMessageContent(
-                message_text=f"<a href='{bookmark_url}'>{bookmark['title'] or bookmark['url']}</a>",
+                message_text=(
+                    f"<a href='{preview_url or link}'>{title or link}</a>\n"
+                    f"<a href='{link}'>原文</a> | <a href='https://www.instapaper.com/{bookmark_id}'>Instapaper</a>"
+                ),
                 parse_mode=ParseMode.HTML
             ),
             url=bookmark['url'],
@@ -31,7 +38,7 @@ async def get_all_unread(update, context):
             # reply_markup=InlineKeyboardMarkup(keyboard)
         )
     await update.inline_query.answer(
-        list(map(format_unread, list_all(client))),
+        [format_unread(x, context) for x in list_all(client)],
         auto_pagination=True,
         cache_time=120
     )

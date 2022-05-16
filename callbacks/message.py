@@ -2,6 +2,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
 from utils.persistence import bot_persistence
 from utils.instapaper import get_client, get_text, save
+from utils.bookmark_preview import create_page
 
 VERIFY = 2
 
@@ -30,16 +31,15 @@ async def verify_login(update, context):
     message = await update.message.reply_text('登录中，请稍候…')
     if get_client(context.user_data):
         context.user_data['client'] = get_client(context.user_data)
+        context.user_data['logged_in'] = True
+        context.user_data.pop('password')
         await bot_persistence.flush()
         await bot.edit_message_text(
             chat_id=message.chat_id,
             message_id=message.message_id,
             text='登录成功！试着发送带链接的消息，看看能不能保存到 Instapaper。\n\n另外，欢迎关注 @instasaverlog，以及时了解 bot 的运行状况。'
         )
-        context.user_data['logged_in'] = True
-        await bot_persistence.flush()
         return END
-
     else:
         keyboard = [[InlineKeyboardButton(
             "重新尝试", callback_data='login_confirm')]]
@@ -70,8 +70,7 @@ async def save_link(update, context):
         text_links = list(map(lambda x: x if x.type ==
                           'url' else x.url, text_link_entities))
         links.extend(text_links)
-        link_ids = {}
-        titles = {}
+        bookmarks = {}
         count = 0
         failed = 0
         message_saving = await update.message.reply_text(f"保存中 …")
@@ -79,37 +78,51 @@ async def save_link(update, context):
         # Start saving
         for link in links:
             bookmark_id, title = save(client, link)
-            # html_text = get_text(client, bookmark_id)
-            # print(html_text)
-            link_ids[link] = bookmark_id
-            titles[bookmark_id] = title
+            html_text = get_text(client, bookmark_id)
+            preview_url = await create_page(title or link, html_text)
             if bookmark_id:
                 count += 1
+                bookmarks[bookmark_id] = {
+                    'title': title,
+                    'link': link,
+                    'preview_url': preview_url
+                }
+                context.user_data[str(bookmark_id)] = {'preview_url':preview_url}
                 await message_saving.edit_text(f"已保存（{count}/{len(links)}）…")
             else:
                 failed += 1
             await bot_persistence.flush()
-
         if count:
             failed_saving = f"另有 {failed} 篇未能保存。" if failed else ""
             await message_saving.edit_text(f"成功保存 {count} 篇文章!\n" + failed_saving)
         else:
             await update.message.reply_text("保存失败，请重新尝试 :(")
 
-        # Return the saved articles as preview messages
-        for link in links:
-            bookmark_id = link_ids[link]
-            title = titles[bookmark_id]
+        # Return the saved bookmarks as messages to preview
+        for bookmark_id, bookmark in bookmarks.items():
+            title = bookmark['title']
+            link = bookmark['link']
+            preview_url = bookmark['preview_url']
             keyboard = [[
                 InlineKeyboardButton(
                     "🗑", callback_data=f'delete_{bookmark_id}'),
                 InlineKeyboardButton(
                     "💙", callback_data=f'like_{bookmark_id}')
             ], [InlineKeyboardButton("查看文章列表", switch_inline_query_current_chat='')]]
+            if title:
+                message_text = (
+                    f"<a href='{preview_url or link}'><strong>{title}</strong></a>\n"
+                    f"<a href='{link}'>原文</a> | <a href='https://www.instapaper.com/read/{bookmark_id}'>Instapaper</a>"
+                )
+            else:
+                message_text = (
+                    f"{link}\n"
+                    f"<a href='{link}'>原文</a> | <a href='https://www.instapaper.com/read/{bookmark_id}'>Instapaper</a>"
+                )
             markup = InlineKeyboardMarkup(keyboard)
             await context.bot.send_message(
                 chat_id=update.message.chat_id,
-                text=f"<a href='https://www.instapaper.com/read/{bookmark_id}'>{title}</a>" if title else link,
+                text=message_text,
                 reply_markup=markup,
                 parse_mode=ParseMode.HTML
             )
