@@ -1,5 +1,5 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, InlineQueryResultArticle, InputTextMessageContent
-from utils.api_method import list_all
+from utils.instapaper import list_all
 from telegram.constants import ParseMode
 from math import floor
 

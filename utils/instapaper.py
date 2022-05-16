@@ -75,6 +75,7 @@ def list_all(client):
 
 
 def get_text(client, bookmark_id):
+    """Get full text of a bookmark in html format."""
     params = {"bookmark_id": bookmark_id}
     html_text = client.request(
         root + apis['get_text'],

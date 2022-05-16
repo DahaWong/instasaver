@@ -1,7 +1,7 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
 from utils.persistence import bot_persistence
-from utils.api_method import get_client, get_text, save
+from utils.instapaper import get_client, get_text, save
 
 VERIFY = 2
 

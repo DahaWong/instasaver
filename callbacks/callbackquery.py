@@ -2,7 +2,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ConversationHandler
 from telegram.constants import ParseMode
 import re
-from utils.api_method import delete, like, unlike
+from utils.instapaper import delete, like, unlike
 from utils.persistence import bot_persistence
 
 REQUEST_DELETE, = range(1)
