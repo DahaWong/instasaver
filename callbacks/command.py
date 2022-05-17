@@ -1,5 +1,10 @@
+'''
+Callback handler functions of Command updates.
+'''
+
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from config import meta
+from constants import BOT_NAME, DEVELOPER_TELEGRAM_USERNAME, REPOSITORY_URL, STUDIO_URL
 
 
 async def start(update, context):
@@ -14,7 +19,7 @@ async def start(update, context):
         ]
         markup = InlineKeyboardMarkup(keyboard_lan)
         await update.effective_message.reply_text(
-            '欢迎使用 Instasaver！\n开始使用前，请先登录您的账号。',
+            f'欢迎使用 {BOT_NAME}！\n开始使用前，请先登录您的账号。',
             reply_markup=markup
         )
         return USERNAME
@@ -48,11 +53,11 @@ async def quit_(update, context):
 
 
 async def about(update, context):
-    keyboard = [[InlineKeyboardButton("源 代 码", url='https://github.com/DahaWong/instasaver'),
-                InlineKeyboardButton("工 作 室", url='https://dreamlong.design/')]]
+    keyboard = [[InlineKeyboardButton("源 代 码", url=REPOSITORY_URL),
+                InlineKeyboardButton("工 作 室", url=STUDIO_URL)]]
     markup = InlineKeyboardMarkup(keyboard)
     await update.effective_message.reply_markdown(
-        (f"*Instasaver*  `{meta['version']}`\n"
+        (f"*{BOT_NAME}*  `{meta['version']}`\n"
          "保存消息中的链接到你的 Instapaper。\n\n"
-         "由 @dahawong 制作"
+         f"由 @{DEVELOPER_TELEGRAM_USERNAME} 制作"
          ), reply_markup=markup)

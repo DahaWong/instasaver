@@ -1,7 +1,5 @@
 '''
 API request methods for manipulating Instapaper account.
-
-1.All request should be made by POST method.
 '''
 
 from config import oauth_consumer_id, oauth_consumer_secret
@@ -26,6 +24,7 @@ apis = {
 
 
 def get_client(data):
+    '''Get oauth client for Instapaper API.'''
     consumer = oauth.Consumer(oauth_consumer_id, oauth_consumer_secret)
     client = oauth.Client(consumer)
     client.add_credentials(data['username'], data['password'])
@@ -55,6 +54,7 @@ def get_client(data):
 
 
 def verify_user(client):
+    '''Verify user's credentials.'''
     _, user_data = client.request(
         root + apis['verify'],
         method="POST"
@@ -64,6 +64,7 @@ def verify_user(client):
 
 
 def list_all(client):
+    '''List all bookmarks in Instapaper account.'''
     params = {"limit": 100}
     bookmarks = client.request(
         root + apis['list'],
@@ -87,6 +88,7 @@ def get_text(client, bookmark_id):
 
 
 def save(client, url):
+    '''Save an article link as Instapaper bookmark.'''
     params = {"url": url}
     bookmark = ast.literal_eval(
         client.request(
@@ -99,6 +101,7 @@ def save(client, url):
 
 
 def delete(client, bookmark_id):
+    '''Permanently delete a bookmark by its id.'''
     params = {"bookmark_id": bookmark_id}
     empty = ast.literal_eval(client.request(
         root + apis['delete'],
@@ -112,6 +115,7 @@ def delete(client, bookmark_id):
 
 
 def like(client, bookmark_id):
+    '''Star an Instapaper bookmark.'''
     params = {"bookmark_id": bookmark_id}
     bookmark = ast.literal_eval(client.request(
         root + apis['like'],
@@ -125,6 +129,7 @@ def like(client, bookmark_id):
 
 
 def unlike(client, bookmark_id):
+    '''Unstar an Instapaper bookmark.'''
     params = {"bookmark_id": bookmark_id}
     bookmark = ast.literal_eval(client.request(
         root + apis['unlike'],

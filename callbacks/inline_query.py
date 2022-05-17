@@ -1,3 +1,7 @@
+'''
+Callback handler functions of InlineQuery updates.
+'''
+
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, InlineQueryResultArticle, InputTextMessageContent
 from utils.instapaper import list_all
 from telegram.constants import ParseMode

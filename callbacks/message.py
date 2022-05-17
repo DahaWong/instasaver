@@ -1,6 +1,10 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
 from utils.persistence import bot_persistence
+'''
+Callback handler functions of Message updates.
+'''
+
 from utils.instapaper import get_client, get_text, save
 from utils.bookmark_preview import create_page
 
