@@ -1,6 +1,5 @@
 from telegraph.aio import Telegraph
 from telegraph.utils import ALLOWED_TAGS
-from telegraph.exceptions import CONTENT_TOO_BIG
 from bs4 import BeautifulSoup
 
 

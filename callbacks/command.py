@@ -13,13 +13,13 @@ async def start(update, context):
              InlineKeyboardButton("登 录", callback_data='login_confirm')]
         ]
         markup = InlineKeyboardMarkup(keyboard_lan)
-        await update.message.reply_text(
+        await update.effective_message.reply_text(
             '欢迎使用 Instasaver！\n开始使用前，请先登录您的账号。',
             reply_markup=markup
         )
         return USERNAME
     else:
-        await update.message.reply_text(
+        await update.effective_message.reply_text(
             text='您已登录，可以直接使用！',
             reply_markup=InlineKeyboardMarkup.from_button(
                 InlineKeyboardButton('查看文章列表', switch_inline_query_current_chat=''))
@@ -37,13 +37,13 @@ async def quit_(update, context):
              ]
         ]
         markup = InlineKeyboardMarkup(keyboard)
-        await update.message.reply_text(
+        await update.effective_message.reply_text(
             '确认解绑账号吗？',
             reply_markup=markup
         )
         return CONFIRM_QUIT
     else:
-        await update.message.reply_text("你还没有登录～\n前往：/start")
+        await update.effective_message.reply_text("你还没有登录～\n前往：/start")
         return END
 
 
@@ -51,7 +51,7 @@ async def about(update, context):
     keyboard = [[InlineKeyboardButton("源 代 码", url='https://github.com/DahaWong/instasaver'),
                 InlineKeyboardButton("工 作 室", url='https://dreamlong.design/')]]
     markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_markdown(
+    await update.effective_message.reply_markdown(
         (f"*Instasaver*  `{meta['version']}`\n"
          "保存消息中的链接到你的 Instapaper。\n\n"
          "由 @dahawong 制作"

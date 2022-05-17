@@ -17,5 +17,5 @@ oauth_consumer_secret = config['OAUTH']['CONSUMER_SECRET']
 
 # Meta
 meta = {
-    'version': '2.1.5'
+    'version': '2.2.0'
 }

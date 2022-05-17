@@ -9,15 +9,15 @@ VERIFY = 2
 
 async def reply_normal_text(update, context):
     if context.user_data.__contains__('logged_in'):
-        await update.message.reply_text('请发送带链接的消息，看看能不能保存到 Instapaper。')
+        await update.effective_message.reply_text('请发送带链接的消息，看看能不能保存到 Instapaper。')
     else:
-        await update.message.reply_text('请先登录 Instapaper。\n点击开始：/start')
+        await update.effective_message.reply_text('请先登录 Instapaper。\n点击开始：/start')
 
 
 async def request_password(update, context):
     # 记录使用者的 Instapaper 登录名（username）
-    context.user_data['username'] = update.message.text
-    await update.message.reply_text('请输入密码：')
+    context.user_data['username'] = update.effective_message.text
+    await update.effective_message.reply_text('请输入密码：')
     return VERIFY
 
 
@@ -26,13 +26,13 @@ async def verify_login(update, context):
     USERNAME = 0
     bot = context.bot
     # 记录使用者的 Instapaper 密码（password）
-    context.user_data['password'] = update.message.text
-    await update.message.delete()
-    message = await update.message.reply_text('登录中，请稍候…')
+    context.user_data['password'] = update.effective_message.text
+    await update.effective_message.delete()
+    message = await update.effective_message.reply_text('登录中，请稍候…')
     if get_client(context.user_data):
         context.user_data['client'] = get_client(context.user_data)
         context.user_data['logged_in'] = True
-        context.user_data.pop('password') # Remove password upon logged in.
+        context.user_data.pop('password')  # Remove password upon logged in.
         await bot_persistence.flush()
         await bot.edit_message_text(
             chat_id=message.chat_id,
@@ -59,21 +59,23 @@ async def save_link(update, context):
     logged_in = context.user_data.__contains__('client')
     if logged_in:
         client = context.user_data['client']
-        if not update.message.caption:
-            links = list(update.message.parse_entities('url').values())
+        if not update.effective_message.caption:
+            links = list(
+                update.effective_message.parse_entities('url').values())
             text_link_entities = filter(
-                lambda x: x.type == 'text_link', update.message.entities)
+                lambda x: x.type == 'text_link', update.effective_message.entities)
         else:
-            links = list(update.message.parse_caption_entities('url').values())
+            links = list(
+                update.effective_message.parse_caption_entities('url').values())
             text_link_entities = filter(
-                lambda x: x.type == 'text_link', update.message.caption_entities)
+                lambda x: x.type == 'text_link', update.effective_message.caption_entities)
         text_links = list(map(lambda x: x if x.type ==
                           'url' else x.url, text_link_entities))
         links.extend(text_links)
         bookmarks = {}
         count = 0
         failed = 0
-        message_saving = await update.message.reply_text(f"保存中 …")
+        message_saving = await update.effective_message.reply_text(f"保存中 …")
 
         # Start saving
         for link in links:
@@ -87,7 +89,8 @@ async def save_link(update, context):
                     'link': link,
                     'preview_url': preview_url
                 }
-                context.user_data[str(bookmark_id)] = {'preview_url':preview_url}
+                context.user_data[str(bookmark_id)] = {
+                    'preview_url': preview_url}
                 await message_saving.edit_text(f"已保存（{count}/{len(links)}）…")
             else:
                 failed += 1
@@ -96,7 +99,7 @@ async def save_link(update, context):
             failed_saving = f"另有 {failed} 篇未能保存。" if failed else ""
             await message_saving.edit_text(f"成功保存 {count} 篇文章!\n" + failed_saving)
         else:
-            await update.message.reply_text("保存失败，请重新尝试 :(")
+            await update.effective_message.reply_text("保存失败，请重新尝试 :(")
 
         # Return the saved bookmarks as messages to preview
         for bookmark_id, bookmark in bookmarks.items():
@@ -121,10 +124,10 @@ async def save_link(update, context):
                 )
             markup = InlineKeyboardMarkup(keyboard)
             await context.bot.send_message(
-                chat_id=update.message.chat_id,
+                chat_id=update.effective_message.chat_id,
                 text=message_text,
                 reply_markup=markup,
                 parse_mode=ParseMode.HTML
             )
     else:
-        await update.message.reply_text('请先登录 Instapaper。\n点击开始：/start')
+        await update.effective_message.reply_text('请先登录 Instapaper。\n点击开始：/start')
