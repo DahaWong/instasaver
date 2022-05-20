@@ -1,12 +1,12 @@
-import re
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.constants import ParseMode
-from constants import INSTANT_VIEW_SUPPORTED_DOMAINS
-from utils.persistence import bot_persistence
-from urllib import request
 '''
 Callback handler functions of Message updates.
 '''
+import re
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.constants import ParseMode
+from helper import INSTANT_VIEW_SUPPORTED_DOMAINS
+from utils.persistence import bot_persistence
+from urllib import request
 
 import utils.instapaper as instapaper
 from utils.bookmark_preview import create_page
@@ -90,15 +90,15 @@ async def save_link(update, context):
                 link = request.urlopen(link).geturl()
             except:
                 pass
-            domain_in_url = r"^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/?\n]+)"
-            match = re.match(domain_in_url, link)
+            bookmark_id, title = instapaper.save(client, link)
+            html_text = instapaper.get_text(client, bookmark_id)
+            domain_in_url_pattern = r"^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/?\n]+)"
+            match = re.match(domain_in_url_pattern, link)
             domain = match.group(1) if match else None
             if domain and (domain in INSTANT_VIEW_SUPPORTED_DOMAINS):
                 preview_url = link
             else:
                 preview_url = await create_page(title or link, html_text)
-            bookmark_id, title = instapaper.save(client, link)
-            html_text = instapaper.get_text(client, bookmark_id)
             if bookmark_id:
                 count += 1
                 bookmarks[bookmark_id] = {
