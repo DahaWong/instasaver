@@ -92,13 +92,17 @@ async def save_link(update, context):
                 pass
             bookmark_id, title = instapaper.save(client, link)
             html_text = instapaper.get_text(client, bookmark_id)
-            domain_in_url_pattern = r"^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/?\n]+)"
-            match = re.match(domain_in_url_pattern, link)
-            domain = match.group(1) if match else None
+
+            pattern = r"^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/?\n]+)"
+            match_domain_in_url = re.match(pattern, link)
+            domain = match_domain_in_url.group(
+                1) if match_domain_in_url else None
             if domain and (domain in INSTANT_VIEW_SUPPORTED_DOMAINS):
+                # print(domain)
                 preview_url = link
             else:
                 preview_url = await create_page(title or link, html_text)
+
             if bookmark_id:
                 count += 1
                 bookmarks[bookmark_id] = {
