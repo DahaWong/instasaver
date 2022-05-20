@@ -5,6 +5,7 @@ Callback handler functions of Command updates.
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from config import meta
 from constants import BOT_NAME, DEVELOPER_TELEGRAM_USERNAME, REPOSITORY_URL, STUDIO_URL
+from utils import instapaper
 
 
 async def start(update, context):
@@ -27,7 +28,7 @@ async def start(update, context):
         await update.effective_message.reply_text(
             text='您已登录，可以直接使用！',
             reply_markup=InlineKeyboardMarkup.from_button(
-                InlineKeyboardButton('查看文章列表', switch_inline_query_current_chat=''))
+                InlineKeyboardButton('查看文章列表', switch_inline_query_current_chat='#'))
         )
         return END
 
@@ -61,3 +62,9 @@ async def about(update, context):
          "保存消息中的链接到你的 Instapaper。\n\n"
          f"由 @{DEVELOPER_TELEGRAM_USERNAME} 制作"
          ), reply_markup=markup)
+
+
+async def test(update, context):
+    client = context.user_data['client']
+    folders = instapaper.get_folders(client)
+    print(folders)

@@ -1,5 +1,5 @@
 '''
-To genrate a Telegraph-based preview of an Instapaper bookmark.
+To generate a Telegraph-based preview of an Instapaper bookmark.
 '''
 
 
@@ -12,10 +12,10 @@ from constants import BOT_URL, BOT_NAME
 def format_html(text):
     '''Format html texts that fetched from Instapaper to Telegraph allowed forms.'''
     soup = BeautifulSoup(text, 'lxml')
-    
-    # Format headings, h1 -> h3, h2 -> h4, and other headings to <strong> tag.
+
+    # Find all possible heading types, and convert them to proper h3,h4,strong tags.
     headings = soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
-    heading_types = sorted(set([x.name for x in headings])) # Find all possible heading types
+    heading_types = sorted(set([x.name for x in headings]))
     if headings:
         for heading in headings:
             if heading.name == heading_types[0]:
@@ -25,8 +25,9 @@ def format_html(text):
             else:
                 heading.name = 'strong'
 
-    # a) Unwrap(i.e. remove) all unallowed tags and b) Remove all empty tags.
-    ALLOWED_VOID_TAGS = {'br', 'img', 'figure', 'aside', 'iframe', 'ol', 'ul', 'hr'}
+    # a) Unwrap all unallowed tags and b) Remove all empty tags.
+    ALLOWED_VOID_TAGS = {'br', 'img', 'figure',
+                         'aside', 'iframe', 'ol', 'ul', 'hr'}
     for tag in soup.find_all():
         if tag.name not in ALLOWED_TAGS:
             tag.unwrap()

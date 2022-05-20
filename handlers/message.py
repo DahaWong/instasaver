@@ -21,3 +21,8 @@ normal_text_handler = MessageHandler(
     ~filters.Entity('text_link') &
     ~filters.CaptionEntity('text_link') &
     ~filters.CaptionEntity('url'), callback.reply_normal_text)
+
+
+move_bookmark_handler = MessageHandler(
+    filters.TEXT &
+    filters.VIA_BOT, callback.move_bookmark)

@@ -132,7 +132,7 @@ async def save_link(update, context):
                     "🗑", callback_data=f'delete_{bookmark_id}'),
                 InlineKeyboardButton(
                     "💙", callback_data=f'like_{bookmark_id}')
-            ], [InlineKeyboardButton("查看文章列表", switch_inline_query_current_chat='')]]
+            ], [InlineKeyboardButton("移动到…", switch_inline_query_current_chat=f'move_{bookmark_id}_to'), InlineKeyboardButton("查看文章列表", switch_inline_query_current_chat='#')]]
             if title:
                 message_text = (
                     f"<a href='{preview_url or link}'><strong>{title}</strong></a>\n"
@@ -152,3 +152,15 @@ async def save_link(update, context):
             )
     else:
         await update.effective_message.reply_text('请先登录 Instapaper。\n点击开始：/start')
+
+
+async def move_bookmark(update, context):
+    client = context.user_data['client']
+    text = update.effective_message.text
+    match = re.match(r"^move_(\d+)_to_(\d+)$", text)
+    bookmark_id, folder_id = match.group(1), match.group(2)
+    title = instapaper.move(client, bookmark_id, folder_id)
+    if (title):
+        await update.effective_message.reply_text(f"《{title}》移动成功~")
+    else:
+        await update.effective_message.reply_text("移动失败 :(")

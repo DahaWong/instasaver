@@ -20,6 +20,8 @@ apis = {
     'unarchive': 'api/1/bookmarks/unarchive',
     'list': 'api/1/bookmarks/list',
     'get_text': 'api/1/bookmarks/get_text',
+    'move': 'api/1/bookmarks/move',
+    'get_folders': 'api/1/folders/list',
 }
 
 
@@ -87,8 +89,19 @@ def get_text(client, bookmark_id):
     return html_text
 
 
+def get_folders(client):
+    '''Get all folders in an Instapaper account.
+    Output: A list of the account's user-created folders. 
+    '''
+    folders = ast.literal_eval(client.request(
+        root + apis['get_folders'],
+        method="POST"
+    )[1].decode('utf-8'))
+    return folders
+
+
 def save(client, url):
-    '''Save an article link as Instapaper bookmark.'''
+    '''Save an article link as bookmark.'''
     params = {"url": url}
     bookmark = ast.literal_eval(
         client.request(
@@ -115,7 +128,7 @@ def delete(client, bookmark_id):
 
 
 def like(client, bookmark_id):
-    '''Star an Instapaper bookmark.'''
+    '''Star a bookmark.'''
     params = {"bookmark_id": bookmark_id}
     bookmark = ast.literal_eval(client.request(
         root + apis['like'],
@@ -129,7 +142,7 @@ def like(client, bookmark_id):
 
 
 def unlike(client, bookmark_id):
-    '''Unstar an Instapaper bookmark.'''
+    '''Unstar a bookmark.'''
     params = {"bookmark_id": bookmark_id}
     bookmark = ast.literal_eval(client.request(
         root + apis['unlike'],
@@ -140,3 +153,14 @@ def unlike(client, bookmark_id):
         return False
     else:
         return True
+
+
+def move(client, bookmark_id, folder_id):
+    '''Move a bookmark to a folder.'''
+    params = {"bookmark_id": bookmark_id, "folder_id": folder_id}
+    moved_bookmark = ast.literal_eval(client.request(
+        root + apis['move'],
+        method="POST",
+        body=urllib.parse.urlencode(params)
+    )[1].decode('utf-8'))[0]
+    return moved_bookmark.get('title')

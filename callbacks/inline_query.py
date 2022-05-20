@@ -2,8 +2,10 @@
 Callback handler functions of InlineQuery updates.
 '''
 
+import re
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, InlineQueryResultArticle, InputTextMessageContent
-from utils.instapaper import list_all
+from callbacks import callbackquery
+from utils import instapaper
 from telegram.constants import ParseMode
 from math import floor
 
@@ -23,7 +25,8 @@ async def get_all_unread(update, context):
         #     InlineKeyboardButton("🗑", callback_data=f'delete_{bookmark_id}'),
         #     InlineKeyboardButton("💙", callback_data=f'like_{bookmark_id}')
         # ],[InlineKeyboardButton("查看文章列表", switch_inline_query_current_chat='')]]
-        keyboard = [[InlineKeyboardButton("查看文章列表", switch_inline_query_current_chat='')]]
+        keyboard = [[InlineKeyboardButton(
+            "查看文章列表", switch_inline_query_current_chat='#'), InlineKeyboardButton("移动到…", switch_inline_query_current_chat=f'move_{bookmark_id}_to')]]
         return InlineQueryResultArticle(
             id=bookmark_id,
             title=title or link,
@@ -43,7 +46,39 @@ async def get_all_unread(update, context):
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
     await update.inline_query.answer(
-        [format_unread(x, context) for x in list_all(client)],
+        [format_unread(x, context) for x in instapaper.list_all(client)],
         auto_pagination=True,
-        cache_time=120
+        cache_time=0
+    )
+
+
+async def get_folders(update, context):
+    client = context.user_data.get('client')
+    folders = instapaper.get_folders(client)
+    await update.inline_query.answer(
+        [InlineQueryResultArticle(
+            id=folder.get('folder_id'),
+            title=folder.get('display_title') or folder.get('title'),
+            input_message_content=InputTextMessageContent(
+                message_text="📁 " + folder.get('title'))
+        ) for folder in folders],
+        auto_pagination=True,
+        cache_time=0
+    )
+
+
+async def select_folder_to_move(update, context):
+    query = update.inline_query.query
+    client = context.user_data.get('client')
+    folders = instapaper.get_folders(client)
+    await update.inline_query.answer(
+        [InlineQueryResultArticle(
+            id=folder.get('folder_id'),
+            title=folder.get('display_title') or folder.get('title'),
+            input_message_content=InputTextMessageContent(
+                message_text="_".join([query, str(folder.get('folder_id'))])
+            )
+        ) for folder in folders],
+        auto_pagination=True,
+        cache_time=0
     )

@@ -77,7 +77,7 @@ async def like_link(update, context):
         keyboard = [[
             InlineKeyboardButton("🗑", callback_data=f'delete_{bookmark_id}'),
             InlineKeyboardButton("❤️", callback_data=f'unlike_{bookmark_id}')
-        ], [InlineKeyboardButton("查看文章列表", switch_inline_query_current_chat='')]]
+        ], [InlineKeyboardButton("移动到…", switch_inline_query_current_chat=f'move_{bookmark_id}_to'), InlineKeyboardButton("查看文章列表", switch_inline_query_current_chat='#')]]
         message = update.callback_query.message
         # this is for inline mode that callback query don't have a message
         inline_message_id = update.callback_query.inline_message_id
@@ -105,7 +105,7 @@ async def unlike_link(update, context):
         keyboard = [[
             InlineKeyboardButton("🗑", callback_data=f'delete_{bookmark_id}'),
             InlineKeyboardButton("💙", callback_data=f'like_{bookmark_id}')
-        ], [InlineKeyboardButton("查看文章列表", switch_inline_query_current_chat='')]]
+        ], [InlineKeyboardButton("移动到…", switch_inline_query_current_chat=f'move_{bookmark_id}_to'), InlineKeyboardButton("查看文章列表", switch_inline_query_current_chat='#')]]
         await query.edit_message_reply_markup(InlineKeyboardMarkup(keyboard))
     else:
         await query.answer(':(')
