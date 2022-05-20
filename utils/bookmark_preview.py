@@ -15,7 +15,7 @@ def format_html(text):
     
     # Format headings, h1 -> h3, h2 -> h4, and other headings to <strong> tag.
     headings = soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
-    heading_types = sorted(set([x.name for x in headings]))
+    heading_types = sorted(set([x.name for x in headings])) # Find all possible heading types
     if headings:
         for heading in headings:
             if heading.name == heading_types[0]:
