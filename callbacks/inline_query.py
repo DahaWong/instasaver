@@ -2,9 +2,7 @@
 Callback handler functions of InlineQuery updates.
 '''
 
-import re
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, InlineQueryResultArticle, InputTextMessageContent
-from callbacks import callbackquery
 from utils import instapaper
 from telegram.constants import ParseMode
 from math import floor
@@ -55,6 +53,7 @@ async def get_all_unread(update, context):
 async def get_folders(update, context):
     client = context.user_data.get('client')
     folders = instapaper.get_folders(client)
+    
     await update.inline_query.answer(
         [InlineQueryResultArticle(
             id=folder.get('folder_id'),
@@ -62,8 +61,7 @@ async def get_folders(update, context):
             input_message_content=InputTextMessageContent(
                 message_text="📁 " + folder.get('title'))
         ) for folder in folders],
-        auto_pagination=True,
-        cache_time=0
+        auto_pagination=True
     )
 
 
@@ -71,14 +69,28 @@ async def select_folder_to_move(update, context):
     query = update.inline_query.query
     client = context.user_data.get('client')
     folders = instapaper.get_folders(client)
-    await update.inline_query.answer(
-        [InlineQueryResultArticle(
+    
+    if folders:
+        results = [InlineQueryResultArticle(
             id=folder.get('folder_id'),
             title=folder.get('display_title') or folder.get('title'),
             input_message_content=InputTextMessageContent(
-                message_text="_".join([query, str(folder.get('folder_id'))])
+                message_text="_".join(
+                    [query, str(folder.get('folder_id'))])
             )
-        ) for folder in folders],
+        ) for folder in folders]
+    else:
+        results = [InlineQueryResultArticle(
+            id=0,
+            title="还没有创建文件夹",
+            input_message_content=InputTextMessageContent(
+                message_text="前往 <a href='https://www.instapaper.com'>Instapaper</a> 创建文件夹",
+                parse_mode=ParseMode.HTML
+            )
+        )]
+        
+    await update.inline_query.answer(
+        results,
         auto_pagination=True,
-        cache_time=0
+        cache_time=600
     )
