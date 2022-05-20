@@ -44,7 +44,7 @@ async def request_delete_link(update, context):
 async def confirm_delete_link(update, context):
     query = update.callback_query
     pattern = '(delete_)([0-9]+)'
-    bookmark_id:str = re.match(pattern, query.data).group(2)
+    bookmark_id: str = re.match(pattern, query.data).group(2)
     client = context.user_data['client']
     delete(client, bookmark_id)
     await query.edit_message_text('删除成功～')

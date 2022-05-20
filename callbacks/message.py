@@ -1,11 +1,14 @@
+import re
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
+from constants import INSTANT_VIEW_SUPPORTED_DOMAINS
 from utils.persistence import bot_persistence
+from urllib import request
 '''
 Callback handler functions of Message updates.
 '''
 
-from utils.instapaper import get_client, get_text, save
+import utils.instapaper as instapaper
 from utils.bookmark_preview import create_page
 
 VERIFY = 2
@@ -33,8 +36,8 @@ async def verify_login(update, context):
     context.user_data['password'] = update.effective_message.text
     await update.effective_message.delete()
     message = await update.effective_message.reply_text('登录中，请稍候…')
-    if get_client(context.user_data):
-        context.user_data['client'] = get_client(context.user_data)
+    if instapaper.get_client(context.user_data):
+        context.user_data['client'] = instapaper.get_client(context.user_data)
         context.user_data['logged_in'] = True
         context.user_data.pop('password')  # Remove password upon logged in.
         await bot_persistence.flush()
@@ -83,9 +86,19 @@ async def save_link(update, context):
 
         # Start saving
         for link in links:
-            bookmark_id, title = save(client, link)
-            html_text = get_text(client, bookmark_id)
-            preview_url = await create_page(title or link, html_text)
+            try:
+                link = request.urlopen(link).geturl()
+            except:
+                pass
+            domain_in_url = r"^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/?\n]+)"
+            match = re.match(domain_in_url, link)
+            domain = match.group(1) if match else None
+            if domain and (domain in INSTANT_VIEW_SUPPORTED_DOMAINS):
+                preview_url = link
+            else:
+                preview_url = await create_page(title or link, html_text)
+            bookmark_id, title = instapaper.save(client, link)
+            html_text = instapaper.get_text(client, bookmark_id)
             if bookmark_id:
                 count += 1
                 bookmarks[bookmark_id] = {

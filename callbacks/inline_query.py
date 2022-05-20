@@ -23,7 +23,7 @@ async def get_all_unread(update, context):
         #     InlineKeyboardButton("🗑", callback_data=f'delete_{bookmark_id}'),
         #     InlineKeyboardButton("💙", callback_data=f'like_{bookmark_id}')
         # ],[InlineKeyboardButton("查看文章列表", switch_inline_query_current_chat='')]]
-        keyboard = [[[InlineKeyboardButton("查看文章列表", switch_inline_query_current_chat='')]]]
+        keyboard = [[InlineKeyboardButton("查看文章列表", switch_inline_query_current_chat='')]]
         return InlineQueryResultArticle(
             id=bookmark_id,
             title=title or link,
