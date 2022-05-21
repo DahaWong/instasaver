@@ -29,10 +29,11 @@ def format_html(text):
     ALLOWED_VOID_TAGS = {'br', 'img', 'figure',
                          'aside', 'iframe', 'ol', 'ul', 'hr'}
     for tag in soup.find_all():
-        if tag.name not in ALLOWED_TAGS:
+        if tag.name not in ALLOWED_TAGS or (
+           tag.name not in ALLOWED_VOID_TAGS and len(tag.get_text()) == 0
+           ):
             tag.unwrap()
-        if tag.name not in ALLOWED_VOID_TAGS and len(tag.get_text()) == 0:
-            tag.extract()
+    print(soup.prettify())
     return str(soup)
 
 
@@ -50,3 +51,12 @@ async def create_page(title, content):
         return response['url']
     except:
         return None
+
+
+# def main():
+#     html = """<li>::before</li>"""
+#     format_html(html)
+
+
+# if __name__ == '__main__':
+#     main()

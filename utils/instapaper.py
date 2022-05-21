@@ -85,7 +85,7 @@ def get_text(client, bookmark_id):
         method="POST",
         body=urllib.parse.urlencode(params)
     )[1].decode('utf-8')
-
+    
     return html_text
 
 
