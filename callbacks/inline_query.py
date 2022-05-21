@@ -50,26 +50,11 @@ async def get_all_unread(update, context):
     )
 
 
-async def get_folders(update, context):
-    client = context.user_data.get('client')
-    folders = instapaper.get_folders(client)
-    
-    await update.inline_query.answer(
-        [InlineQueryResultArticle(
-            id=folder.get('folder_id'),
-            title=folder.get('display_title') or folder.get('title'),
-            input_message_content=InputTextMessageContent(
-                message_text="📁 " + folder.get('title'))
-        ) for folder in folders],
-        auto_pagination=True
-    )
-
-
 async def select_folder_to_move(update, context):
     query = update.inline_query.query
     client = context.user_data.get('client')
     folders = instapaper.get_folders(client)
-    
+
     if folders:
         results = [InlineQueryResultArticle(
             id=folder.get('folder_id'),
@@ -88,7 +73,7 @@ async def select_folder_to_move(update, context):
                 parse_mode=ParseMode.HTML
             )
         )]
-        
+
     await update.inline_query.answer(
         results,
         auto_pagination=True,

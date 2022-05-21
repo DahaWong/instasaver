@@ -1,9 +1,6 @@
 from telegram.ext import InlineQueryHandler
 import callbacks.inline_query as callbacks
 
-get_folders_handler = InlineQueryHandler(
-    callbacks.get_folders, pattern=r'^\/$')
-
 all_unread_handler = InlineQueryHandler(
     callbacks.get_all_unread, pattern=r'^\#$')
 
