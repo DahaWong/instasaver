@@ -3,6 +3,7 @@ Callback handler functions of InlineQuery updates.
 '''
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, InlineQueryResultArticle, InputTextMessageContent
+from constants import BLACK_SQUARE, WHITE_SQUARE
 from utils import instapaper
 from telegram.constants import ParseMode
 from math import floor
@@ -37,9 +38,9 @@ async def get_all_unread(update, context):
             ),
             url=bookmark['url'],
             description=''.join(
-                ['■'*progress_count,
-                 '□'*(5-progress_count),
-                 f" {round(bookmark['progress']*100)}%",
+                [BLACK_SQUARE* progress_count,
+                 WHITE_SQUARE * ( 5 - progress_count ),
+                 f" {round(bookmark['progress'] * 100)}%",
                  ]),
             reply_markup=InlineKeyboardMarkup(keyboard)
         )

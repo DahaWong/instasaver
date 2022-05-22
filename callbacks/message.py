@@ -169,3 +169,6 @@ async def move_bookmark(update, context):
         await update.effective_message.delete()
     else:
         await update.effective_message.reply_text("移动失败 :(")
+
+async def delete_message(update, context):
+    await update.effective_message.delete()

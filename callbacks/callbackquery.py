@@ -68,47 +68,38 @@ async def cancel_delete_link(update, context):
 
 
 async def like_link(update, context):
-    bot = context.bot
+    message = update.effective_message
     data = update.callback_query.data
     client = context.user_data['client']
     pattern = '(like_)([0-9]+)'
     bookmark_id = re.match(pattern, data).group(2)
     if like(client, bookmark_id):
+        message = update.callback_query.message
+        await message.pin(disable_notification=True)
         keyboard = [[
             InlineKeyboardButton("🗑", callback_data=f'delete_{bookmark_id}'),
             InlineKeyboardButton("❤️", callback_data=f'unlike_{bookmark_id}')
         ], [InlineKeyboardButton("移动到…", switch_inline_query_current_chat=f'move_{bookmark_id}_to'), InlineKeyboardButton("查看文章列表", switch_inline_query_current_chat='#')]]
-        message = update.callback_query.message
-        # this is for inline mode that callback query don't have a message
-        inline_message_id = update.callback_query.inline_message_id
-        markup = InlineKeyboardMarkup(keyboard)
-        await bot.edit_message_reply_markup(
-            chat_id=message.chat_id if message else None,
-            message_id=message.message_id if message else None,
-            inline_message_id=inline_message_id,
-            reply_markup=markup
-        )
+        await message.edit_reply_markup(InlineKeyboardMarkup(keyboard))
     else:
-        await bot.answer_callback_query(
-            update.callback_query.id,
-            ':('
-        )
+        await message.reply_text('操作失败 :(')
 
 
 async def unlike_link(update, context):
-    query = update.callback_query
-    data = query.data
+    message = update.effective_message
+    data = update.callback_query.data
     client = context.user_data['client']
     pattern = r'(unlike_)([0-9]+)'
     bookmark_id = re.match(pattern, data).group(2)
     if unlike(client, bookmark_id):
+        await message.unpin()
         keyboard = [[
             InlineKeyboardButton("🗑", callback_data=f'delete_{bookmark_id}'),
             InlineKeyboardButton("💙", callback_data=f'like_{bookmark_id}')
         ], [InlineKeyboardButton("移动到…", switch_inline_query_current_chat=f'move_{bookmark_id}_to'), InlineKeyboardButton("查看文章列表", switch_inline_query_current_chat='#')]]
-        await query.edit_message_reply_markup(InlineKeyboardMarkup(keyboard))
+        await message.edit_reply_markup(InlineKeyboardMarkup(keyboard))
     else:
-        await query.answer(':(')
+        await message.reply_text('操作失败 :(')
 
 
 async def cancel_quit(update, context):

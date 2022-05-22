@@ -4,7 +4,7 @@ Callback handler functions of Command updates.
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from config import meta
-from constants import BOT_NAME, DEVELOPER_TELEGRAM_USERNAME, REPOSITORY_URL, STUDIO_URL
+from constants import BOT_NAME, DEVELOPER_TELEGRAM_USERNAME, REPOSITORY_URL, STUDIO_URL, WHITE_SQUARE
 from utils import instapaper
 
 
