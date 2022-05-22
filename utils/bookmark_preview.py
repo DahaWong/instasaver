@@ -33,7 +33,6 @@ def format_html(text):
            tag.name not in ALLOWED_VOID_TAGS and len(tag.get_text()) == 0
            ):
             tag.unwrap()
-    print(soup.prettify())
     return str(soup)
 
 

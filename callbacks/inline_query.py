@@ -22,7 +22,7 @@ async def get_all_unread(update, context):
         # keyboard = [[
         #     InlineKeyboardButton("🗑", callback_data=f'delete_{bookmark_id}'),
         #     InlineKeyboardButton("💙", callback_data=f'like_{bookmark_id}')
-        # ],[InlineKeyboardButton("查看文章列表", switch_inline_query_current_chat='')]]
+        # ],[InlineKeyboardButton("查看文章列表", switch_inline_query_current_chat='#')]]
         keyboard = [[InlineKeyboardButton(
             "查看文章列表", switch_inline_query_current_chat='#'), InlineKeyboardButton("移动到…", switch_inline_query_current_chat=f'move_{bookmark_id}_to')]]
         return InlineQueryResultArticle(
@@ -77,5 +77,5 @@ async def select_folder_to_move(update, context):
     await update.inline_query.answer(
         results,
         auto_pagination=True,
-        cache_time=600
+        cache_time=0
     )

@@ -8,6 +8,7 @@ password_handler = MessageHandler(filters.TEXT, callback.verify_login)
 
 link_handler = MessageHandler(
     ~filters.VIA_BOT &
+    filters.ChatType.PRIVATE &
     (filters.Entity('url') |
      filters.Entity('text_link') |
      filters.CaptionEntity('text_link') |
@@ -20,7 +21,8 @@ normal_text_handler = MessageHandler(
     ~filters.COMMAND &
     ~filters.Entity('text_link') &
     ~filters.CaptionEntity('text_link') &
-    ~filters.CaptionEntity('url'), callback.reply_normal_text)
+    ~filters.CaptionEntity('url') &
+    ~filters.StatusUpdate.ALL, callback.reply_normal_text)
 
 
 move_bookmark_handler = MessageHandler(
