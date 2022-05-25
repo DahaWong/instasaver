@@ -4,10 +4,9 @@ Callback handler functions of Message updates.
 import re
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
+from telegram.ext import ConversationHandler
 from helper import INSTANT_VIEW_SUPPORTED_DOMAINS
-from utils.persistence import bot_persistence
 from urllib import request
-
 import utils.instapaper as instapaper
 from utils.bookmark_preview import create_page
 
@@ -22,44 +21,37 @@ async def reply_normal_text(update, context):
 
 
 async def request_password(update, context):
-    # 记录使用者的 Instapaper 登录名（username）
-    context.user_data['username'] = update.effective_message.text
-    await update.effective_message.reply_text('请输入密码：')
+    message = update.message
+    context.user_data['username'] = message.text
+    await message.reply_text('请输入密码：')
     return VERIFY
 
 
 async def verify_login(update, context):
-    END = -1
     USERNAME = 0
-    bot = context.bot
+    message = update.message
     # Get the password from the user
-    context.user_data['password'] = update.effective_message.text
-    await update.effective_message.delete()
-    message = await update.effective_message.reply_text('登录中，请稍候…')
+    password = message.text
+    await update.message.delete()
+    replied_message = await message.reply_text('登录中，请稍候…')
     if instapaper.get_client(context.user_data):
-        context.user_data['client'] = instapaper.get_client(context.user_data)
+        username = context.user_data['username']
+        context.user_data['client'] = instapaper.get_client(username, password)
         context.user_data['logged_in'] = True
-        # Remove password upon logged in successfully
-        context.user_data.pop('password')
-        await bot_persistence.flush()
-        await bot.edit_message_text(
-            chat_id=message.chat_id,
-            message_id=message.message_id,
-            text='登录成功！试着发送带链接的消息，看看能不能保存到 Instapaper。\n\n另外，欢迎关注 @instasaverlog，以及时了解 bot 的运行状况。'
+        await replied_message.edit_text(
+            text=(
+                '登录成功！试着发送带链接的消息，看看能不能保存到 Instapaper。\n\n'
+                '另外，欢迎关注 @instasaverlog，以及时了解 bot 的运行状况。'
+            )
         )
-        return END
+        return ConversationHandler.END
     else:
-        keyboard = [[InlineKeyboardButton(
-            "重新尝试", callback_data='login_confirm')]]
-        markup = InlineKeyboardMarkup(keyboard)
-        await bot.edit_message_text(
-            chat_id=message.chat_id,
-            message_id=message.message_id,
+        await replied_message.edit_text(
             text='抱歉，登录失败！',
-            reply_markup=markup
+            reply_markup=InlineKeyboardMarkup.from_button(
+                [InlineKeyboardButton("重新尝试", callback_data='login_confirm')])
         )
         context.user_data.pop('username')
-        context.user_data.pop('password')
         return USERNAME
 
 
@@ -68,7 +60,7 @@ async def save_link(update, context):
     message = update.effective_message
     if is_logged_in:
         client = context.user_data['client']
-        # detect if the link is from media caption or a text message
+        # Detect if the link is from media caption or a text message
         if message.caption:
             links = list(
                 message.parse_caption_entities('url').values())
@@ -119,7 +111,6 @@ async def save_link(update, context):
                 await replied_message.edit_text(f"已保存（{count}/{len(links)}）…")
             else:
                 failed += 1
-            await bot_persistence.flush()
         if count:
             failed_saving = f"另有 {failed} 篇未能保存。" if failed else ""
             await replied_message.edit_text(f"成功保存 {count} 篇文章!\n" + failed_saving)

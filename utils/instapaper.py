@@ -25,16 +25,16 @@ apis = {
 }
 
 
-def get_client(data):
+def get_client(username, password):
     '''Get oauth client for Instapaper API.'''
     consumer = oauth.Consumer(oauth_consumer_id, oauth_consumer_secret)
     client = oauth.Client(consumer)
-    client.add_credentials(data['username'], data['password'])
+    client.add_credentials(username, password)
     client.authorizations
 
     params = {
-        "x_auth_username": data['username'],
-        "x_auth_password": data['password'],
+        "x_auth_username": username,
+        "x_auth_password": password,
         "x_auth_mode": 'client_auth'
     }
 
@@ -85,7 +85,7 @@ def get_text(client, bookmark_id):
         method="POST",
         body=urllib.parse.urlencode(params)
     )[1].decode('utf-8')
-    
+
     return html_text
 
 

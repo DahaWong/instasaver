@@ -29,5 +29,6 @@ move_bookmark_handler = MessageHandler(
     filters.TEXT &
     filters.VIA_BOT, callback.move_bookmark)
 
+
 status_message_handler = MessageHandler(
     filters.StatusUpdate.ALL, callback.delete_message)

@@ -3,6 +3,7 @@ Callback handler functions of Command updates.
 '''
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import ConversationHandler
 from config import meta
 from constants import BOT_NAME, DEVELOPER_TELEGRAM_USERNAME, REPOSITORY_URL, STUDIO_URL, WHITE_SQUARE
 from utils import instapaper
@@ -10,7 +11,6 @@ from utils import instapaper
 
 async def start(update, context):
     USERNAME = 0
-    END = -1
     # Initialize user_data
     context.user_data['message_to_delete'] = []
     if not context.user_data.__contains__('logged_in'):
@@ -30,7 +30,7 @@ async def start(update, context):
             reply_markup=InlineKeyboardMarkup.from_button(
                 InlineKeyboardButton('查看文章列表', switch_inline_query_current_chat='#'))
         )
-        return END
+        return ConversationHandler.END
 
 
 async def quit_(update, context):
