@@ -9,6 +9,7 @@ from helper import INSTANT_VIEW_SUPPORTED_DOMAINS
 from urllib import request
 import utils.instapaper as instapaper
 from utils.bookmark_preview import create_page
+from utils.database import db, User
 
 VERIFY = 2
 
@@ -32,11 +33,12 @@ async def verify_login(update, context):
     message = update.message
     # Get the password from the user
     password = message.text
+    username = context.user_data['username']
     await update.message.delete()
     replied_message = await message.reply_text('登录中，请稍候…')
-    if instapaper.get_client(context.user_data):
-        username = context.user_data['username']
-        context.user_data['client'] = instapaper.get_client(username, password)
+    client = instapaper.get_client(username, password)
+    if client:
+        context.user_data['client'] = client
         context.user_data['logged_in'] = True
         await replied_message.edit_text(
             text=(
@@ -44,12 +46,13 @@ async def verify_login(update, context):
                 '另外，欢迎关注 @instasaverlog，以及时了解 bot 的运行状况。'
             )
         )
+        
         return ConversationHandler.END
     else:
         await replied_message.edit_text(
             text='抱歉，登录失败！',
             reply_markup=InlineKeyboardMarkup.from_button(
-                [InlineKeyboardButton("重新尝试", callback_data='login_confirm')])
+                InlineKeyboardButton("重新尝试", callback_data='login_confirm'))
         )
         context.user_data.pop('username')
         return USERNAME
@@ -160,6 +163,7 @@ async def move_bookmark(update, context):
         await update.effective_message.delete()
     else:
         await update.effective_message.reply_text("移动失败 :(")
+
 
 async def delete_message(update, context):
     await update.effective_message.delete()

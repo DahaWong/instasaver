@@ -32,14 +32,14 @@ async def get_all_unread(update, context):
             input_message_content=InputTextMessageContent(
                 message_text=(
                     f"<a href='{preview_url or link}'><strong>{title or preview_url or link}</strong></a>\n"
-                    f"<a href='{link}'>原文</a> | <a href='https://www.instapaper.com/{bookmark_id}'>Instapaper</a>"
+                    f"<a href='{link}'>原文</a> | <a href='https://www.instapaper.com/read/{bookmark_id}'>Instapaper</a>"
                 ),
                 parse_mode=ParseMode.HTML
             ),
             url=bookmark['url'],
             description=''.join(
-                [BLACK_SQUARE* progress_count,
-                 WHITE_SQUARE * ( 5 - progress_count ),
+                [BLACK_SQUARE * progress_count,
+                 WHITE_SQUARE * (5 - progress_count),
                  f" {round(bookmark['progress'] * 100)}%",
                  ]),
             reply_markup=InlineKeyboardMarkup(keyboard)

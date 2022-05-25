@@ -2,7 +2,6 @@ from peewee import *
 import datetime
 
 db = SqliteDatabase('instasaver.db')
-db.connect()
 
 
 class BaseModel(Model):
