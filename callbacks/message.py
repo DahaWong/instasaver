@@ -46,7 +46,7 @@ async def verify_login(update, context):
                 '另外，欢迎关注 @instasaverlog，以及时了解 bot 的运行状况。'
             )
         )
-        
+
         return ConversationHandler.END
     else:
         await replied_message.edit_text(
