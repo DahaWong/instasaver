@@ -44,7 +44,7 @@ async def quit_(update, context):
         ]
         markup = InlineKeyboardMarkup(keyboard)
         await update.effective_message.reply_text(
-            '确认解绑账号吗？',
+            '确认解绑账号吗？这将会清除您在本机器人中所有的数据。',
             reply_markup=markup
         )
         return CONFIRM_QUIT

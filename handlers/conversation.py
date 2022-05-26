@@ -1,6 +1,6 @@
 from telegram.ext import ConversationHandler
 from handlers.command import start_handler, quit_handler
-from handlers.callbackquery import login_confirm_handler, quit_cancel_handler, quit_confirm_handler, request_delete_link_handler, confirm_delete_link_handler, cancel_delete_link_handler
+from handlers.callback_query import login_confirm_handler, quit_cancel_handler, quit_confirm_handler, request_delete_link_handler, confirm_delete_link_handler, cancel_delete_link_handler
 from handlers.message import password_handler, username_handler
 
 USERNAME, PASSWORD, VERIFY = range(3)

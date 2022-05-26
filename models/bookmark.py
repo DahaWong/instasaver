@@ -10,4 +10,4 @@ class Bookmark(BaseModel):
     title = TextField()
     user = ForeignKeyField(User, backref='bookmarks')
     folder = ForeignKeyField(Folder, backref='bookmarks')
-    created_at = DateTimeField(default=datetime.datetime.now)
+    created_at = DateTimeField(default=datetime.now)

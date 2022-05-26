@@ -24,7 +24,8 @@ async def reply_normal_text(update, context):
 async def request_password(update, context):
     message = update.message
     context.user_data['username'] = message.text
-    await message.reply_text('请输入密码：')
+    msg = await message.reply_text('请输入密码：')
+    context.user_data['msg_request_pwd'] = msg.message_id
     return VERIFY
 
 
@@ -34,7 +35,11 @@ async def verify_login(update, context):
     # Get the password from the user
     password = message.text
     username = context.user_data['username']
-    await update.message.delete()
+    await update.message.delete()  # Delete password message
+    await context.bot.delete_message(
+        chat_id=update.effective_chat.id,
+        message_id=context.user_data.get('msg_request_pwd')
+    )
     replied_message = await message.reply_text('登录中，请稍候…')
     client = instapaper.get_client(username, password)
     if client:
