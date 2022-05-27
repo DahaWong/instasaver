@@ -5,3 +5,4 @@ config.ini
 persistence
 .DS_Store
 *\.db
+.venv/*

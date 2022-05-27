@@ -2,16 +2,17 @@
 Callback handler functions of CallbackQuery updates.
 '''
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ConversationHandler
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram.ext import ConversationHandler, CallbackContext
 from telegram.constants import ParseMode
 from utils.instapaper import delete, like, unlike
 import re
+from utils.database import *
 
 REQUEST_DELETE, = range(1)
 
 
-async def request_username(update, context):
+async def request_username(update: Update, context:CallbackContext):
     PASSWORD = 1
     await update.effective_message.edit_text(
         text="请输入<strong>用户名</strong>或者<strong>邮箱</strong>：",
@@ -20,7 +21,7 @@ async def request_username(update, context):
     return PASSWORD
 
 
-async def request_delete_link(update, context):
+async def request_delete_link(update: Update, context:CallbackContext):
     message = update.effective_message
     if message:
         context.user_data['message_to_delete'].append(message.message_id)
@@ -35,13 +36,12 @@ async def request_delete_link(update, context):
     return REQUEST_DELETE
 
 
-async def confirm_delete_link(update, context):
+async def confirm_delete_link(update: Update, context:CallbackContext):
     query = update.callback_query
     pattern = '(delete_)([0-9]+)'
     bookmark_id: str = re.match(pattern, query.data).group(2)
     client = context.user_data['client']
     delete(client, bookmark_id)
-    await query.edit_message_text('删除成功～')
     for message_id in context.user_data['message_to_delete']:
         await context.bot.delete_message(
             chat_id=update.effective_chat.id,
@@ -49,10 +49,11 @@ async def confirm_delete_link(update, context):
         )
     context.user_data.pop(bookmark_id)
     context.user_data['message_to_delete'].clear()
+    await query.edit_message_text('删除成功～')
     return ConversationHandler.END
 
 
-async def cancel_delete_link(update, context):
+async def cancel_delete_link(update: Update, context:CallbackContext):
     query = update.callback_query
     await query.answer('已取消～')
     await query.delete_message()
@@ -60,7 +61,7 @@ async def cancel_delete_link(update, context):
     return ConversationHandler.END
 
 
-async def like_link(update, context):
+async def like_link(update: Update, context:CallbackContext):
     message = update.effective_message
     data = update.callback_query.data
     client = context.user_data['client']
@@ -77,7 +78,7 @@ async def like_link(update, context):
         await message.reply_text('操作失败 :(')
 
 
-async def unlike_link(update, context):
+async def unlike_link(update: Update, context:CallbackContext):
     message = update.effective_message
     data = update.callback_query.data
     client = context.user_data['client']
@@ -94,15 +95,21 @@ async def unlike_link(update, context):
         await message.reply_text('操作失败 :(')
 
 
-async def cancel_quit(update, context):
+async def cancel_quit(update: Update, context:CallbackContext):
     query = update.callback_query
     await query.delete_message()
     await query.answer('已返回，可以继续保存文章啦。')
     return ConversationHandler.END
 
 
-async def confirm_quit(update, context):
-    # TODO: remove user in database, too
+async def confirm_quit(update: Update, context:CallbackContext):
+    # TODO: set cascading delete rule
+    username = update.effective_user.username
+    (User
+        .select()
+        .where(User.username == username)
+        .get()
+        .delete_instance())
     context.user_data.clear()
     await update.callback_query.edit_message_text('解绑成功！')
     return ConversationHandler.END

@@ -2,26 +2,28 @@
 Callback handler functions of Message updates.
 '''
 import re
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.constants import ParseMode
 from telegram.ext import ConversationHandler
 from helper import INSTANT_VIEW_SUPPORTED_DOMAINS
 from urllib import request
 import utils.instapaper as instapaper
 from utils.bookmark_preview import create_page
-from utils.database import db, User
+from models import *
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram.ext import CallbackContext
 
 VERIFY = 2
 
 
-async def reply_normal_text(update, context):
+async def reply_normal_text(update: Update, context:CallbackContext):
     if context.user_data.__contains__('logged_in'):
         await update.effective_message.reply_text('请发送带链接的消息，看看能不能保存到 Instapaper。')
     else:
         await update.effective_message.reply_text('请先登录 Instapaper。\n点击开始：/start')
 
 
-async def request_password(update, context):
+async def request_password(update: Update, context:CallbackContext):
     message = update.message
     context.user_data['username'] = message.text
     msg = await message.reply_text('请输入密码：')
@@ -29,13 +31,14 @@ async def request_password(update, context):
     return VERIFY
 
 
-async def verify_login(update, context):
+async def verify_login(update: Update, context:CallbackContext):
     USERNAME = 0
     message = update.message
+    user = update.effective_user
     # Get the password from the user
     password = message.text
     username = context.user_data['username']
-    await update.message.delete()  # Delete password message
+    await message.delete()  # Delete password message
     await context.bot.delete_message(
         chat_id=update.effective_chat.id,
         message_id=context.user_data.get('msg_request_pwd')
@@ -45,14 +48,20 @@ async def verify_login(update, context):
     if client:
         context.user_data['client'] = client
         context.user_data['logged_in'] = True
-        await replied_message.edit_text(
-            text=(
-                '登录成功！试着发送带链接的消息，看看能不能保存到 Instapaper。\n\n'
-                '另外，欢迎关注 @instasaverlog，以及时了解 bot 的运行状况。'
+        try:
+            await replied_message.edit_text(
+                text=(
+                    '登录成功！试着发送带链接的消息，看看能不能保存到 Instapaper。\n\n'
+                    '另外，欢迎关注 @instasaverlog，以及时了解 bot 的运行状况。'
+                )
             )
-        )
-
-        return ConversationHandler.END
+            with db.atomic():
+                User.create(
+                    id = user.id,
+                    username=user.username,
+                ).save()
+        finally:
+            return ConversationHandler.END
     else:
         await replied_message.edit_text(
             text='抱歉，登录失败！',
@@ -63,7 +72,7 @@ async def verify_login(update, context):
         return USERNAME
 
 
-async def save_link(update, context):
+async def save_link(update: Update, context:CallbackContext):
     is_logged_in = context.user_data.__contains__('logged_in')
     message = update.effective_message
     if is_logged_in:
@@ -157,7 +166,7 @@ async def save_link(update, context):
         await update.effective_message.reply_text('请先登录 Instapaper。\n点击开始：/start')
 
 
-async def move_bookmark(update, context):
+async def move_bookmark(update: Update, context:CallbackContext):
     client = context.user_data['client']
     text = update.effective_message.text
     match = re.match(r"^move_(\d+)_to_(\d+)$", text)
@@ -170,5 +179,5 @@ async def move_bookmark(update, context):
         await update.effective_message.reply_text("移动失败 :(")
 
 
-async def delete_message(update, context):
+async def delete_message(update: Update, context:CallbackContext):
     await update.effective_message.delete()

@@ -6,6 +6,7 @@ config.read('config.ini')
 
 # Bot
 bot_token = config['BOT']['TOKEN']
+dev_user_id = int(config['BOT']['DEV_USER_ID'])
 
 # Instapaper Oauth Info
 oauth_consumer_id = config['OAUTH']['CONSUMER_ID']
@@ -17,5 +18,5 @@ instagram_password = config['INSTAGRAM']['PWD']
 
 # Meta
 meta = {
-    'version': '2.2.4'
+    'version': '2.2.5'
 }

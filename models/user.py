@@ -4,5 +4,5 @@ from datetime import datetime
 
 class User(BaseModel):
     id = IntegerField(primary_key=True)
-    first_name = TextField()
+    username = TextField()
     join_at = DateTimeField(default=datetime.now)

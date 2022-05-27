@@ -2,14 +2,15 @@
 Callback handler functions of InlineQuery updates.
 '''
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, InlineQueryResultArticle, InputTextMessageContent
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, InlineQueryResultArticle, InputTextMessageContent, Update
+from telegram.ext import CallbackContext
 from constants import BLACK_SQUARE, WHITE_SQUARE
 from utils import instapaper
 from telegram.constants import ParseMode
 from math import floor
 
 
-async def get_all_unread(update, context):
+async def get_all_unread(update: Update, context:CallbackContext):
     client = context.user_data.get('client')
 
     def format_unread(bookmark, context):
@@ -51,7 +52,7 @@ async def get_all_unread(update, context):
     )
 
 
-async def select_folder_to_move(update, context):
+async def select_folder_to_move(update: Update, context:CallbackContext):
     query = update.inline_query.query
     client = context.user_data.get('client')
     folders = instapaper.get_folders(client)
